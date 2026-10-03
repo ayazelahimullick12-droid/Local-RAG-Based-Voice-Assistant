@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+config/.env
+knowledge/.embed_cache.json
+logs/
+benchmark_samples/*.wav
+*.nemo
+*.pth
+.cache/
+*.zip
+!docker/Dockerfile.nemo

@@ -1,0 +1,12 @@
+# Only needed for the NeMo Conformer-CTC fallback STT
+# (kazalbrur/bangla-stt-conformer-120m-dialects). Install inside
+# docker/Dockerfile.nemo (nvcr.io/nvidia/nemo base) — NOT in the main app
+# container: nemo_toolkit's dependency tree regularly conflicts with the
+# transformers/torch versions BanglaASR needs.
+#
+# ai4bharat/indic-conformer-600m-multilingual does NOT need this file — it
+# loads through plain transformers (trust_remote_code=True); see
+# assistant/stt/indic_conformer.py.
+
+nemo_toolkit[asr]>=2.0
+huggingface_hub>=0.24

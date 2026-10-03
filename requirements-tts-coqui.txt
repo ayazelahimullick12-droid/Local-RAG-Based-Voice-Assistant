@@ -1,0 +1,7 @@
+# Only needed if TTS_ENGINE=emtiazz_vits (the default). The EMTIAZZ VITS
+# checkpoint is Coqui-VITS format, loaded via Coqui's own `TTS` package, not
+# transformers. Upstream coqui-ai/TTS is semi-abandoned and version-picky;
+# try the community-maintained fork first.
+coqui-tts>=0.24
+# If coqui-tts fights your Python version, fall back to the original instead:
+#   TTS==0.22.0

@@ -1,0 +1,23 @@
+# Only needed for the NeMo Conformer-CTC fallback STT
+# (kazalbrur/bangla-stt-conformer-120m-dialects). Kept in its own container
+# because nemo_toolkit's dependency tree regularly conflicts with the
+# transformers/torch pins the main app (BanglaASR) needs.
+#
+# Research (Sept 2026) found community reports of nvcr.io/nvidia/nemo:26.04
+# working on GB10 — there is no official DGX-Spark-support statement from
+# NVIDIA for this tag; verify with scripts/check_platform.py after build.
+ARG NGC_NEMO_TAG=26.04
+FROM nvcr.io/nvidia/nemo:${NGC_NEMO_TAG}
+
+WORKDIR /app
+COPY requirements-nemo.txt .
+RUN pip install --no-cache-dir -r requirements-nemo.txt
+
+COPY assistant/ ./assistant/
+COPY scripts/ ./scripts/
+COPY config/ ./config/
+
+ENV PYTHONUNBUFFERED=1
+# Default command benchmarks the fallback STT against the primary engine's
+# sample set — this container isn't meant to run the live mic loop.
+CMD ["python", "-m", "scripts.benchmark", "--stt", "nemo_conformer"]

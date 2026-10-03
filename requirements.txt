@@ -1,0 +1,42 @@
+# Main application environment (docker/Dockerfile.app).
+# Deliberately excludes torch / torchaudio / torchvision: those come from the
+# nvcr.io/nvidia/pytorch base image, which ships a real CUDA build for the
+# GB10 (sm_121) GPU. `pip install torch` here would silently replace it with
+# a PyPI CPU or wrong-arch wheel — never add torch to this file.
+#
+# Versions are unpinned-ish (minimums only) because they have not been
+# installed on the actual aarch64 box yet. Run this inside the NGC container
+# on the DGX Spark, resolve any conflicts, then freeze with `pip freeze`.
+
+transformers>=4.44
+accelerate>=0.33
+huggingface_hub>=0.24
+
+# audio I/O
+sounddevice>=0.4.6
+soundfile>=0.12.1
+numpy>=1.26
+scipy>=1.11
+
+# VAD — pip package wraps the snakers4/silero-vad model + ONNX/torch runtime
+silero-vad>=5.1
+
+# LLM client (Ollama)
+ollama>=0.3.0
+
+# TTS engine deps are NOT listed here on purpose — each TTS engine's
+# loading library is imported lazily (see assistant/tts/*.py), and each is
+# fragile/heavy enough (Coqui TTS is semi-abandoned; parler-tts installs
+# from git) that a failure in one shouldn't block installing the rest of
+# the app. Install ONLY the file matching your configured TTS_ENGINE:
+#   TTS_ENGINE=emtiazz_vits -> pip install -r requirements-tts-coqui.txt
+#   TTS_ENGINE=mms_tts      -> nothing extra, transformers (above) covers it
+#   TTS_ENGINE=indic_parler -> pip install -r requirements-tts-parler.txt
+
+# RAG
+scikit-learn>=1.4
+
+# config
+pydantic>=2.7
+pydantic-settings>=2.3
+python-dotenv>=1.0

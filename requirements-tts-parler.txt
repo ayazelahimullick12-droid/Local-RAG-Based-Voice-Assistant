@@ -1,0 +1,3 @@
+# Only needed if TTS_ENGINE=indic_parler. Not on PyPI as a stable release —
+# installed from source.
+parler-tts @ git+https://github.com/huggingface/parler-tts.git

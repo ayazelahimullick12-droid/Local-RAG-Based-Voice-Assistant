@@ -1,0 +1,48 @@
+# DGX Spark deployment. Run from the repo root:
+#   docker compose -f docker/docker-compose.yml up --build
+#
+# Audio passthrough uses raw ALSA (/dev/snd). DGX OS (Ubuntu-based) may run
+# PipeWire/PulseAudio instead of raw ALSA by default — if the container
+# can't see your USB mic/speaker, mount the Pulse socket instead/as well:
+#   -v /run/user/1000/pulse:/run/user/1000/pulse
+#   -e PULSE_SERVER=unix:/run/user/1000/pulse/native
+# See README Troubleshooting.
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: bva-ollama
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - OLLAMA_KEEP_ALIVE=-1
+    volumes:
+      - ollama_models:/root/.ollama
+    ports:
+      - "11434:11434"
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.app
+    container_name: bva-app
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - LLM_HOST=http://ollama:11434
+    env_file:
+      - ../config/.env
+    depends_on:
+      - ollama
+    devices:
+      - /dev/snd:/dev/snd
+    volumes:
+      - ../knowledge:/app/knowledge
+      - ../logs:/app/logs
+      - hf_cache:/root/.cache/huggingface
+    stdin_open: true
+    tty: true
+
+volumes:
+  ollama_models:
+  hf_cache:
